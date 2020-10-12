@@ -4,8 +4,10 @@
   "description": "course project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server/index.js"
+    "build-js": "webpack --mode=development",
+    "build-scss": "node-sass --omit-source-map-url src/public/assets/stylesheets/index.scss dist/css/index.css",
+    "build": "npm run build-scss && npm run build-js",
+    "watch": "webpack --watch"
   },
   "author": "",
   "license": "ISC",
@@ -15,5 +17,8 @@
     "express": "^4.17.1",
     "immutable": "^4.0.0-rc.12",
     "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "node-sass": "^4.14.1"
   }
 }
