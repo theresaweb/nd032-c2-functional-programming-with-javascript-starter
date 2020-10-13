@@ -4,10 +4,10 @@
   "description": "course project",
   "main": "index.js",
   "scripts": {
+    "build-scss": "node-sass --omit-source-map-url src/public/assets/stylesheets/index.scss src/public/dist/css/index.css && node-sass --omit-source-map-url src/public/assets/stylesheets/resets.scss src/public/dist/css/resets.css",
     "build-js": "webpack --mode=development",
-    "build-scss": "node-sass --omit-source-map-url src/public/assets/stylesheets/index.scss dist/css/index.css",
-    "build": "npm run build-scss && npm run build-js",
-    "watch": "webpack --watch"
+    "build": "npm run build-css && npm run build-js",
+    "start": "node src/server/index.js"
   },
   "author": "",
   "license": "ISC",
