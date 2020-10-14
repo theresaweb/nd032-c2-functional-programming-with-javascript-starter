@@ -18,7 +18,7 @@ main {
     main .wrapper .tabs {
       display: flex; }
       main .wrapper .tabs div:nth-child(1) {
-        border-right: none; }
+        border-left: none; }
       main .wrapper .tabs div:nth-child(2) {
         border-right: none; }
       main .wrapper .tabs .tab {
