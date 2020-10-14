@@ -25,19 +25,13 @@ const App = (state) => {
         <header></header>
         <main>
             ${Greeting(store.user.name)}
-            <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
-                <p>
-                    One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
-                    the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
-                    This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
-                    applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
-                    explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
-                    but generally help with discoverability of relevant imagery.
-                </p>
-                ${ImageOfTheDay(apod)}
-            </section>
+            <div class="wrapper">
+              <div class="tabs">
+                ${getTabs(store)}
+              </div>
+              <div class="content"></div>
+            </div>
+
         </main>
         <footer></footer>
     `
@@ -75,7 +69,7 @@ const ImageOfTheDay = (apod) => {
     }
 
     // check if the photo of the day is actually type video!
-    if (apod.media_type === "video") {
+    if (apod && apod.media_type === "video") {
         return (`
             <p>See today's featured video <a href="${apod.url}">here</a></p>
             <p>${apod.title}</p>
@@ -83,8 +77,8 @@ const ImageOfTheDay = (apod) => {
         `)
     } else {
         return (`
-            <img src="${apod.image.url}" height="350px" width="100%" />
-            <p>${apod.image.explanation}</p>
+            <img src="${apod && apod.image.url}" height="350px" width="100%" />
+            <p>${apod && apod.image.explanation}</p>
         `)
     }
 }
@@ -99,5 +93,13 @@ const getImageOfTheDay = (state) => {
         .then(res => res.json())
         .then(apod => updateStore(store, { apod }))
 
-    return data
+    return apod
+}
+
+const getTabs = (store) => {
+  let tabs = '';
+  store.rovers.map((rover, index) => {
+    tabs += `<div class="tab ${index===0 && 'active'}">${rover}</div>`
+  })
+  return tabs
 }

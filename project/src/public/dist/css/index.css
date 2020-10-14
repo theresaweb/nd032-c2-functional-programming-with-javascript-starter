@@ -11,6 +11,36 @@ header {
 main {
   flex: 1;
   padding: 20px; }
+  main .wrapper {
+    background: #DDFFE7;
+    max-width: 300px;
+    margin: 0 auto; }
+    main .wrapper .tabs {
+      display: flex; }
+      main .wrapper .tabs div:nth-child(1) {
+        border-right: none; }
+      main .wrapper .tabs div:nth-child(2) {
+        border-right: none; }
+      main .wrapper .tabs .tab {
+        width: 33%;
+        height: 50px;
+        border-top: 1px solid #87ACA3;
+        border-right: 1px solid #87ACA3;
+        border-bottom: 1px solid #87ACA3;
+        border-left: 1px solid #87ACA3;
+        background: #DDFFE7;
+        text-align: center;
+        line-height: 50px;
+        text-transform: capitalize;
+        font-size: 14px; }
+        main .wrapper .tabs .tab.active {
+          border-bottom: none; }
+    main .wrapper .content {
+      border-right: 1px solid #87ACA3;
+      border-bottom: 1px solid #87ACA3;
+      border-left: 1px solid #87ACA3;
+      min-height: 500px;
+      background: #DDFFE7; }
 
 footer {
   /* footer styles */ }
