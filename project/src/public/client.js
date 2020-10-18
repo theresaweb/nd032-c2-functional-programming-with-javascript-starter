@@ -13,10 +13,12 @@ const root = document.getElementById('root')
 
 const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
-    console.log('newstore',store)
+    console.log('store in update',store)
+    let apiError = store.marsPhotos.photos.error
+    let photos = store.marsPhotos.photos.photos
     render(root, store)
     let sliderHtml = document.querySelector('.roverSlider')
-    if (sliderHtml && Object.keys(store.marsPhotos.photos.photos).length > 0) {
+    if (sliderHtml && !apiError && photos && Object.keys(photos).length > 0) {
       initSlider()
     }
 }
@@ -29,7 +31,6 @@ const render = async (root, state) => {
 // create content
 const App = (state) => {
     let { currentRover, rovers, marsPhotos } = state
-    console.log('app currentRover', currentRover)
     return `
         <header></header>
         <main>
@@ -71,22 +72,19 @@ const Greeting = (name) => {
 
 
 const BuildPhotoGallery = (state) => {
-  console.log('state in BuildPhotoGallery',state)
   let { marsPhotos, currentRover } = state
   const photosMap = Map(marsPhotos)
-  console.log('immut photos in buildphotogallery from state',photosMap)
-  if (photosMap.size === 0) {
-    getRoverPhotos(state)
-    return ''
-  } else {
-    let galleryContent = photosMap.get('photos')
-    console.log('gallerycontent', galleryContent)
+  let galleryContent = photosMap.get('photos')
+  console.log('photosmap',photosMap)
+  if (galleryContent && galleryContent.photos && galleryContent.photos.length > 0) {
     let gallery = ''
     galleryContent.photos.map((content, index) => {
-      console.log('content',content)
       gallery += gallerySlide(content.img_src, content.camera, content.rover)
     })
     return gallery
+  } else {
+    getRoverPhotos(state)
+    return '<div>No photos found</div>'
   }
 }
 const gallerySlide = (imgUrl, camera, rover) => {
@@ -101,7 +99,6 @@ const gallerySlide = (imgUrl, camera, rover) => {
     `)
 }
 function initSlider() {
-  console.log('initSlider starts')
   //https://lattecarousel.dev/ es5 implementation
   var options = {
     count: 1,
@@ -137,12 +134,11 @@ const getTabs = (currentRover, rovers) => {
 }
 
 const getRoverPhotos = (state) => {
+    console.log('getting photos,needs to refresh wehn tabs change', state)
     let { currentRover, marsPhotos } = state
-    console.log('getRoverPhotos currentRover:', currentRover)
-    fetch(`http://localhost:3000/marsphotos?rover=${currentRover}`)
+    fetch(`http://localhost:3000/marsphotos?rover=${currentRover.toLowerCase()}`)
         .then(res => res.json())
         .then(marsPhotos => updateStore(store, { marsPhotos }))
-    console.log('getRoverPhotos marsphotos:', marsPhotos)
     return marsPhotos
 }
 
@@ -157,6 +153,7 @@ function addTabClickEvents(state) {
         dataRover = e.target.dataset.rover
         currentRover = dataRover.charAt(0).toUpperCase() + dataRover.slice(1)
         updateStore(store, { currentRover })
+        getRoverPhotos(state)
       }
   }, false);
 };
