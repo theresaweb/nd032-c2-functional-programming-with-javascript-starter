@@ -12,13 +12,12 @@ main {
   flex: 1;
   padding: 20px; }
   main .wrapper {
-    background: #DDFFE7;
     max-width: 300px;
     margin: 0 auto; }
     main .wrapper .tabs {
       display: flex; }
       main .wrapper .tabs div:nth-child(1) {
-        border-left: none; }
+        border-right: none; }
       main .wrapper .tabs div:nth-child(2) {
         border-right: none; }
       main .wrapper .tabs .tab {
@@ -35,12 +34,15 @@ main {
         font-size: 14px; }
         main .wrapper .tabs .tab.active {
           border-bottom: none; }
-    main .wrapper .content {
-      border-right: 1px solid #87ACA3;
-      border-bottom: 1px solid #87ACA3;
-      border-left: 1px solid #87ACA3;
-      min-height: 500px;
-      background: #DDFFE7; }
+    main .wrapper .content .latte-item {
+      overflow: hidden;
+      vertical-align: top; }
+      main .wrapper .content .latte-item img {
+        width: 100%; }
+    main .wrapper .content .latte-previous {
+      left: 20px; }
+    main .wrapper .content .latte-next {
+      right: 20px; }
 
 footer {
   /* footer styles */ }

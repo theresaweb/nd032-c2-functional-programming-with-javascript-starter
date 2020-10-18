@@ -15,7 +15,6 @@ main {
   flex: 1;
   padding: 20px;
   .wrapper {
-    background: #DDFFE7;
     max-width: 300px;
     margin: 0 auto;
     .tabs {
@@ -44,11 +43,19 @@ main {
       }
     }
     .content {
-      border-right: 1px solid #87ACA3;
-      border-bottom: 1px solid #87ACA3;
-      border-left: 1px solid #87ACA3;
-      min-height: 500px;
-      background: #DDFFE7;
+      .latte-item {
+        overflow: hidden;
+        vertical-align: top;
+        img {
+          width: 100%;
+        }
+      }
+      .latte-previous {
+        left: 20px;
+      }
+      .latte-next {
+        right: 20px;
+      }
     }
   }
 }
