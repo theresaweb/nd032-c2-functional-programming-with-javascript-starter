@@ -13,11 +13,10 @@ const root = document.getElementById('root')
 
 const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
-    console.log('update store',store)
     render(root, store)
-    console.log('slider', document.querySelector('.roverSlider'))
+    console.log('store in updatestore', store)
     let sliderHtml = document.querySelector('.roverSlider')
-    if (sliderHtml) {
+    if (sliderHtml && store.marsPhotos.length > 0) {
       initSlider()
     }
 }
@@ -81,19 +80,25 @@ const BuildPhotoGallery = (currentRover, marsPhotos) => {
   let gallery = ''
   galleryContent.map((content, index) => {
     content.map((item, index) => {
-      gallery += gallerySlide(item.img_src)
+      gallery += gallerySlide(item.img_src, item.camera, item.rover)
     })
   })
   return gallery
+
 }
-const gallerySlide = (imgUrl) => {
+const gallerySlide = (imgUrl, camera, rover) => {
   return (`
-    <div class="latte-item"><img src=${imgUrl} /></div>
+    <div class="latte-item">
+      <div class="roverImg"><img src=${imgUrl} /></div>
+      <div class="roverCamera"><strong>Camera:</strong> ${camera.full_name} (${camera.name})</div>
+      <div class="roverName"><strong>Rover:</strong> ${rover.name}</div>
+      <div class="roverInfo"><strong>Launched:</strong> ${rover.launch_date}</div>
+      <div class="roverInfo"><strong>Landed:</strong> ${rover.landing_date}</div>
+    </div>
     `)
 }
 function initSlider() {
-  console.log('initiate slider')
-  //https://lattecarousel.dev/
+  //https://lattecarousel.dev/ es5 implementation
   var options = {
     count: 1,
     move: 1,
@@ -112,6 +117,11 @@ function initSlider() {
     //   },
   };
   var carousel = new latte.Carousel(".roverSlider", options);
+}
+function noPhotos() {
+  return (`
+    <div>No phptos available</div>
+    `)
 }
 // const ImageOfTheDay = (apod) => {
 //

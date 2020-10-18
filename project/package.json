@@ -8,7 +8,7 @@
     "url": "git://github.com/theresaweb/nd032-c2-functional-programming-with-javascript-starte"
   },
   "scripts": {
-    "build-scss": "node-sass --omit-source-map-url src/public/assets/stylesheets/index.scss src/public/dist/css/index.css && node-sass --omit-source-map-url src/public/assets/stylesheets/resets.scss -w src/public/dist/css/resets.css && latte-carousel/dist/latte-carousel.min.css",
+    "build-scss": "node-sass --omit-source-map-url src/public/assets/stylesheets/index.scss src/public/dist/css/index.css && node-sass --omit-source-map-url src/public/assets/stylesheets/resets.scss -w src/public/dist/css/resets.css",
     "build-scss-watch": "node-sass --omit-source-map-url src/public/assets/stylesheets/index.scss src/public/dist/css/index.css && node-sass --omit-source-map-url src/public/assets/stylesheets/resets.scss -w src/public/dist/css/resets.css",
     "build-js": "npx webpack --mode=development",
     "build-js-watch": "npx webpack --watch --mode=development",

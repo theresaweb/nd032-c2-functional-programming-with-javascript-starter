@@ -28,17 +28,16 @@ main {
       .tab {
         width: 33%;
         height: 50px;
-        border-top: 1px solid #87ACA3;
-        border-right: 1px solid #87ACA3;
-        border-bottom: 1px solid #87ACA3;
-        border-left: 1px solid #87ACA3;
-        background: #DDFFE7;
+        border: 1px solid #87ACA3;
+        background: #1AC8DB;
         text-align: center;
         line-height: 50px;
         text-transform: capitalize;
         font-size: 14px;
         &.active {
-          border-bottom: none;
+          font-weight: bold;
+          border: 1px solid #0292B7;
+          font-size: 16px;
         }
       }
     }

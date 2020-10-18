@@ -16,7 +16,7 @@ app.use('/', express.static(path.join(__dirname, '../public')))
 // your API calls
 app.get('/marsphotos', async (req, res) => {
     const today = new Date().toISOString().slice(0,10)
-    let url = `https://api.nasa.gov/mars-photos/api/v1/rovers/Curiosity/photos?earth_date=2020-10-15&api_key=${process.env.API_KEY}`
+    let url = `https://api.nasa.gov/mars-photos/api/v1/rovers/Curiosity/photos?earth_date=${today}&api_key=${process.env.API_KEY}`
     try {
         let photos = await fetch(url)
             .then(res => res.json())
