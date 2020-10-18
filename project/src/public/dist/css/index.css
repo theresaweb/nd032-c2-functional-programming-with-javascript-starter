@@ -25,6 +25,7 @@ main {
         height: 50px;
         border: 1px solid #87ACA3;
         background: #1AC8DB;
+        opacity: .5;
         text-align: center;
         line-height: 50px;
         text-transform: capitalize;
@@ -32,6 +33,7 @@ main {
         main .wrapper .tabs .tab.active {
           font-weight: bold;
           border: 1px solid #0292B7;
+          opacity: 1;
           font-size: 16px; }
     main .wrapper .content .latte-item {
       overflow: hidden;

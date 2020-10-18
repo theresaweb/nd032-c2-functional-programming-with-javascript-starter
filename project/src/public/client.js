@@ -13,13 +13,10 @@ const root = document.getElementById('root')
 
 const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
+    console.log('newstore',store)
     render(root, store)
-    console.log('store in updatestssssssore', store)
     let sliderHtml = document.querySelector('.roverSlider')
-    console.log('check sliderhtml', sliderHtml ? 'yes' : 'no')
-    console.log('check 1marspotos lenght', Object.keys(store.marsPhotos.photos).length)
-    if (sliderHtml && Object.keys(store.marsPhotos.photos).length > 0) {
-      console.log('gonna init slider')
+    if (sliderHtml && Object.keys(store.marsPhotos.photos.photos).length > 0) {
       initSlider()
     }
 }
@@ -32,22 +29,22 @@ const render = async (root, state) => {
 // create content
 const App = (state) => {
     let { currentRover, rovers, marsPhotos } = state
-    console.log('app marsPhotos', marsPhotos)
+    console.log('app currentRover', currentRover)
     return `
         <header></header>
         <main>
             ${Greeting(store.user.name)}
             <div class="wrapper">
               <div class="tabs">
-                ${getTabs(rovers)}
+                ${getTabs(currentRover, rovers)}
               </div>
               <div class="content">
                 <div class="roverSlider" id="carousel">
                   ${BuildPhotoGallery(currentRover, marsPhotos)}
+                  ${addTabClickEvents(state)}
                 </div>
               </div>
             </div>
-
         </main>
         <footer></footer>
     `
@@ -127,57 +124,35 @@ function noPhotos() {
     <div>No phptos available</div>
     `)
 }
-// const ImageOfTheDay = (apod) => {
-//
-//     // If image does not already exist, or it is not from today -- request it again
-//     const today = new Date()
-//     const photodate = new Date(apod.date)
-//
-//     if (!apod || apod.date === today.getDate() ) {
-//         getImageOfTheDay(store)
-//     }
-//
-//     // check if the photo of the day is actually type video!
-//     if (apod && apod.media_type === "video") {
-//         return (`
-//             <p>See today's featured video <a href="${apod.url}">here</a></p>
-//             <p>${apod.title}</p>
-//             <p>${apod.explanation}</p>
-//         `)
-//     } else {
-//         return (`
-//             <img src="${apod && apod.image.url}" height="350px" width="100%" />
-//             <p>${apod && apod.image.explanation}</p>
-//         `)
-//     }
-// }
 
-// ------------------------------------------------------  API CALLS
-
-// Example API call
-// const getImageOfTheDay = (state) => {
-//     let { apod } = state
-//
-//     fetch(`http://localhost:3000/apod`)
-//         .then(res => res.json())
-//         .then(apod => updateStore(store, { apod }))
-//
-//     return apod
-// }
-
-const getTabs = (rovers) => {
+const getTabs = (currentRover, rovers) => {
   let tabs = ''
   rovers.map((rover, index) => {
-    tabs += `<div class="tab ${index===0 && 'active'}">${rover}</div>`
+    tabs += `<div class="tab ${currentRover===rover ? 'active' : ''}" data-rover="${rover.toLowerCase()}">${rover}</div>`
   })
   return tabs
 }
 
 const getRoverPhotos = (state) => {
     let { currentRover, marsPhotos } = state
-    fetch(`http://localhost:3000/marsphotos?cache=123`)
+    fetch(`http://localhost:3000/marsphotos`)
         .then(res => res.json())
         .then(marsPhotos => updateStore(store, { marsPhotos }))
     console.log('getRoverPhotos marsphotos:', marsPhotos)
     return marsPhotos
 }
+
+function hasClass(elem, className) {
+    return elem.className.split(' ').indexOf(className) > -1;
+}
+
+function addTabClickEvents(state) {
+  let { currentRover } = state
+  document.addEventListener('click', function (e) {
+      if (hasClass(e.target, 'tab')) {
+        dataRover = e.target.dataset.rover
+        currentRover = dataRover.charAt(0).toUpperCase() + dataRover.slice(1)
+        updateStore(store, { currentRover })
+      }
+  }, false);
+};
