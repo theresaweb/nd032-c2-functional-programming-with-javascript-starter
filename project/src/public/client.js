@@ -40,7 +40,7 @@ const App = (state) => {
               </div>
               <div class="content">
                 <div class="roverSlider" id="carousel">
-                  ${BuildPhotoGallery(currentRover, marsPhotos)}
+                  ${BuildPhotoGallery(state)}
                   ${addTabClickEvents(state)}
                 </div>
               </div>
@@ -70,21 +70,24 @@ const Greeting = (name) => {
 }
 
 
-const BuildPhotoGallery = (currentRover, marsPhotos) => {
-  // using https://www.npmjs.com/package/@fabricelements/skeleton-carousel
-  console.log('marsPhotos',marsPhotos)
-  if (Object.keys(marsPhotos) === undefined || Object.keys(marsPhotos).length === 0) {
-    getRoverPhotos(currentRover, marsPhotos)
-  }
-  const galleryContent = Map(marsPhotos.photos)
-  let gallery = ''
-  galleryContent.map((content, index) => {
-    content.map((item, index) => {
-      gallery += gallerySlide(item.img_src, item.camera, item.rover)
+const BuildPhotoGallery = (state) => {
+  console.log('state in BuildPhotoGallery',state)
+  let { marsPhotos, currentRover } = state
+  const photosMap = Map(marsPhotos)
+  console.log('immut photos in buildphotogallery from state',photosMap)
+  if (photosMap.size === 0) {
+    getRoverPhotos(state)
+    return ''
+  } else {
+    let galleryContent = photosMap.get('photos')
+    console.log('gallerycontent', galleryContent)
+    let gallery = ''
+    galleryContent.photos.map((content, index) => {
+      console.log('content',content)
+      gallery += gallerySlide(content.img_src, content.camera, content.rover)
     })
-  })
-  return gallery
-
+    return gallery
+  }
 }
 const gallerySlide = (imgUrl, camera, rover) => {
   return (`
@@ -135,7 +138,8 @@ const getTabs = (currentRover, rovers) => {
 
 const getRoverPhotos = (state) => {
     let { currentRover, marsPhotos } = state
-    fetch(`http://localhost:3000/marsphotos`)
+    console.log('getRoverPhotos currentRover:', currentRover)
+    fetch(`http://localhost:3000/marsphotos?rover=${currentRover}`)
         .then(res => res.json())
         .then(marsPhotos => updateStore(store, { marsPhotos }))
     console.log('getRoverPhotos marsphotos:', marsPhotos)

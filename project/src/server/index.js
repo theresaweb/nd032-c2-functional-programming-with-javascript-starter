@@ -16,7 +16,9 @@ app.use('/', express.static(path.join(__dirname, '../public')))
 // your API calls
 app.get('/marsphotos', async (req, res) => {
     const today = new Date().toISOString().slice(0,10)
-    let url = `https://api.nasa.gov/mars-photos/api/v1/rovers/Curiosity/photos?earth_date=2020-10-15&api_key=${process.env.API_KEY}`
+    console.log('req query',req.query)
+    console.log('req params',req.params)
+    let url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${req.query.rover}/photos?earth_date=2020-10-15&api_key=${process.env.API_KEY}`
     try {
         let photos = await fetch(url)
             .then(res => res.json())
@@ -25,16 +27,5 @@ app.get('/marsphotos', async (req, res) => {
         console.log('error in api: marsphotos error:', err);
     }
 })
-// example API call
-// app.get('/apod', async (req, res) => {
-//   console.log('get apod')
-//     try {
-//         let image = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}`)
-//             .then(res => res.json())
-//         res.send({ image })
-//     } catch (err) {
-//         console.log('error:', err);
-//     }
-// })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
