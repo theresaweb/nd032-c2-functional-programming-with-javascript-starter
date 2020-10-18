@@ -51,9 +51,21 @@ main {
       }
       .latte-previous {
         left: 20px;
+        border: 0;
+        background: url('images/rocket.svg');
+        background-size: 100%;
+        width: 50px;
+        height: 50px;
+        transform: rotate(180deg);
       }
       .latte-next {
         right: 20px;
+        border: 0;
+        background: url('images/rocket.svg');
+        background-size: 100%;
+        width: 50px;
+        height: 50px;
+        transform: rotate(0deg);
       }
     }
   }

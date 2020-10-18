@@ -14,9 +14,12 @@ const root = document.getElementById('root')
 const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
     render(root, store)
-    console.log('store in updatestore', store)
+    console.log('store in updatestssssssore', store)
     let sliderHtml = document.querySelector('.roverSlider')
-    if (sliderHtml && store.marsPhotos.length > 0) {
+    console.log('check sliderhtml', sliderHtml ? 'yes' : 'no')
+    console.log('check 1marspotos lenght', Object.keys(store.marsPhotos.photos).length)
+    if (sliderHtml && Object.keys(store.marsPhotos.photos).length > 0) {
+      console.log('gonna init slider')
       initSlider()
     }
 }
@@ -98,6 +101,7 @@ const gallerySlide = (imgUrl, camera, rover) => {
     `)
 }
 function initSlider() {
+  console.log('initSlider starts')
   //https://lattecarousel.dev/ es5 implementation
   var options = {
     count: 1,
