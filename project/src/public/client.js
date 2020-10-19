@@ -72,6 +72,7 @@ const Greeting = (name) => {
 
 
 const BuildPhotoGallery = (state) => {
+  clearContent()
   let { marsPhotos, currentRover } = state
   const photosMap = Map(marsPhotos)
   let galleryContent = photosMap.get('photos')
@@ -149,10 +150,15 @@ function hasClass(elem, className) {
     return elem.className.split(' ').indexOf(className) > -1;
 }
 
+function clearContent() {
+  const sliderDiv = document.querySelector('.roverSlider')
+  if (sliderDiv) {
+    sliderDiv.innerHTML = ''
+  }
+}
 function addTabClickEvents(state) {
   let { currentRover } = state
   document.addEventListener('click', function (e) {
-      document.querySelector('.roverSlider').innerHTML = ''
       if (hasClass(e.target, 'tab')) {
         dataRover = e.target.dataset.rover
         currentRover = dataRover.charAt(0).toUpperCase() + dataRover.slice(1)

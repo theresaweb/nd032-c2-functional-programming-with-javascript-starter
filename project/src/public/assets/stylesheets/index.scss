@@ -12,10 +12,13 @@ header {
 }
 
 main {
+  h1 {
+    text-align: center;
+  }
   flex: 1;
   padding: 20px;
   .wrapper {
-    max-width: 300px;
+    max-width: 500px;
     margin: 0 auto;
     .tabs {
       display: flex;
@@ -45,6 +48,9 @@ main {
       }
     }
     .content {
+      .roverSlider {
+        position: relative;
+      }
       .latte-item {
         overflow: hidden;
         vertical-align: top;
@@ -52,23 +58,21 @@ main {
           width: 100%;
         }
       }
-      .latte-previous {
-        left: 20px;
+      .latte-previous, .latte-next {
         border: 0;
         background: url('images/rocket.svg');
         background-size: 100%;
         width: 50px;
         height: 50px;
-        transform: rotate(180deg);
+        top: 30%;
       }
       .latte-next {
-        right: 20px;
-        border: 0;
-        background: url('images/rocket.svg');
-        background-size: 100%;
-        width: 50px;
-        height: 50px;
         transform: rotate(0deg);
+        right: -40px;
+      }
+      .latte-previous {
+        transform: rotate(180deg);
+        left: -40px;
       }
     }
   }
@@ -80,13 +84,28 @@ footer {
 
 /* -------------------  TABLET  --------------------- */
 @media (min-width: 768px) {
-  /* use mobile */
+
 }
 
 /* -------------------  DESKTOP  -------------------- */
 
 @media (min-width: 1224px) {
-  /* use mobile */
+  .wrapper {
+    max-width: 800px !important;
+    .content {
+      .latte-previous, .latte-next {
+        width: 100px !important;
+        height: 100px !important;
+        top: 40% !important;
+      }
+      .latte-next {
+        right: -60px !important;
+      }
+      .latte-previous {
+        left: -60px !important;
+      }
+    }
+  }
 }
 
 /* -------------------  LARGE SCREENS  -------------- */
