@@ -27,7 +27,6 @@ const render = async (root, state) => {
     root.innerHTML = App(state)
 }
 
-
 // create content
 const App = (state) => {
     let { currentRover, rovers, marsPhotos } = state
@@ -74,12 +73,14 @@ const Greeting = (name) => {
 const BuildPhotoGallery = (state) => {
   clearContent()
   let { marsPhotos, currentRover } = state
+  // use of ImmutableJS
   const photosMap = Map(marsPhotos)
   let galleryContent = photosMap.get('photos')
   if (galleryContent && galleryContent.photos && galleryContent.photos.length > 0) {
     let gallery = ''
-    galleryContent.photos.map((content, index) => {
-      gallery += gallerySlide(content.img_src, content.camera, content.rover)
+    //higher order function
+    gallery = galleryContent.photos.reduce((allSlides, content) => {
+      return allSlides + gallerySlide(content.img_src, content.camera, content.rover)
     })
     return gallery
   } else {
@@ -87,6 +88,7 @@ const BuildPhotoGallery = (state) => {
     return '<div>No Photos available</div>'
   }
 }
+
 const gallerySlide = (imgUrl, camera, rover) => {
   return (`
     <div class="latte-item">
@@ -98,7 +100,8 @@ const gallerySlide = (imgUrl, camera, rover) => {
     </div>
     `)
 }
-function initSlider() {
+
+const initSlider = () => {
   //https://lattecarousel.dev/ es5 implementation
   var options = {
     count: 1,
@@ -119,7 +122,8 @@ function initSlider() {
   };
   var carousel = new latte.Carousel(".roverSlider", options);
 }
-function noPhotos() {
+
+const noPhotos = () => {
   return (`
     <div>No phptos available</div>
     `)
@@ -127,6 +131,7 @@ function noPhotos() {
 
 const getTabs = (currentRover, rovers) => {
   let tabs = ''
+  // use of map
   rovers.map((rover, index) => {
     tabs += `<div class="tab ${currentRover===rover ? 'active' : ''}" data-rover="${rover.toLowerCase()}">${rover}</div>`
   })
@@ -146,19 +151,20 @@ const getRoverPhotos = (state) => {
     return marsPhotos
 }
 
-function hasClass(elem, className) {
+const hasClass = (elem, className) => {
     return elem.className.split(' ').indexOf(className) > -1;
 }
 
-function clearContent() {
+const clearContent = () => {
   const sliderDiv = document.querySelector('.roverSlider')
   if (sliderDiv) {
     sliderDiv.innerHTML = ''
   }
 }
-function addTabClickEvents(state) {
+
+const addTabClickEvents = (state) => {
   let { currentRover } = state
-  document.addEventListener('click', function (e) {
+  window.addEventListener('click', function (e) {
       if (hasClass(e.target, 'tab')) {
         dataRover = e.target.dataset.rover
         currentRover = dataRover.charAt(0).toUpperCase() + dataRover.slice(1)

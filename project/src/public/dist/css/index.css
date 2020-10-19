@@ -1,4 +1,8 @@
 /* -------------------  MOBILE  --------------------- */
+html {
+  background: url("images/clouds.jpeg") no-repeat center center fixed;
+  background-size: cover; }
+
 body {
   display: flex;
   flex-direction: column;
