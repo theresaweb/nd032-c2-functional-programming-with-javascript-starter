@@ -13,9 +13,9 @@ const root = document.getElementById('root')
 
 const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
-    console.log('store in update',store)
-    let apiError = store.marsPhotos.photos.error
-    let photos = store.marsPhotos.photos.photos
+    let photoState = store.marsPhotos.photos
+    let apiError = photoState && photoState.error
+    let photos = photoState && photoState.photos
     render(root, store)
     let sliderHtml = document.querySelector('.roverSlider')
     if (sliderHtml && !apiError && photos && Object.keys(photos).length > 0) {
@@ -75,7 +75,6 @@ const BuildPhotoGallery = (state) => {
   let { marsPhotos, currentRover } = state
   const photosMap = Map(marsPhotos)
   let galleryContent = photosMap.get('photos')
-  console.log('photosmap',photosMap)
   if (galleryContent && galleryContent.photos && galleryContent.photos.length > 0) {
     let gallery = ''
     galleryContent.photos.map((content, index) => {
@@ -84,7 +83,7 @@ const BuildPhotoGallery = (state) => {
     return gallery
   } else {
     getRoverPhotos(state)
-    return '<div>No photos found</div>'
+    return '<div>No Photos available</div>'
   }
 }
 const gallerySlide = (imgUrl, camera, rover) => {
@@ -134,11 +133,15 @@ const getTabs = (currentRover, rovers) => {
 }
 
 const getRoverPhotos = (state) => {
-    console.log('getting photos,needs to refresh wehn tabs change', state)
     let { currentRover, marsPhotos } = state
     fetch(`http://localhost:3000/marsphotos?rover=${currentRover.toLowerCase()}`)
         .then(res => res.json())
-        .then(marsPhotos => updateStore(store, { marsPhotos }))
+        .then((marsPhotos) => {
+          if (Object.keys(marsPhotos.photos.photos).length > 0) {
+            //only update store if api returns photos
+            updateStore(store, { marsPhotos })
+          }
+        })
     return marsPhotos
 }
 
@@ -149,10 +152,13 @@ function hasClass(elem, className) {
 function addTabClickEvents(state) {
   let { currentRover } = state
   document.addEventListener('click', function (e) {
+      document.querySelector('.roverSlider').innerHTML = ''
       if (hasClass(e.target, 'tab')) {
         dataRover = e.target.dataset.rover
         currentRover = dataRover.charAt(0).toUpperCase() + dataRover.slice(1)
-        updateStore(store, { currentRover })
+        //clear marsphotos
+        let marsPhotos = {}
+        updateStore(store, { currentRover, marsPhotos })
         getRoverPhotos(state)
       }
   }, false);
