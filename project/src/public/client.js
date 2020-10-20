@@ -13,6 +13,7 @@ const root = document.getElementById('root')
 
 const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
+    console.log('updateStore: store',store)
     let photoState = store.marsPhotos.photos
     let apiError = photoState && photoState.error
     let photos = photoState && photoState.photos
@@ -24,24 +25,27 @@ const updateStore = (store, newState) => {
 }
 
 const render = async (root, state) => {
+    console.log('render: rendering root', state)
     root.innerHTML = App(state)
+    setTimeout(addTabClickEvents(state.currentRover), 10000)
 }
 
 // create content
 const App = (state) => {
     let { currentRover, rovers, marsPhotos } = state
+    console.log('App: currentrover', currentRover)
     return `
         <header></header>
         <main>
-            ${Greeting(store.user.name)}
+            ${Greeting(state.user.name)}
             <div class="wrapper">
               <div class="tabs">
                 ${getTabs(currentRover, rovers)}
               </div>
               <div class="content">
                 <div class="roverSlider" id="carousel">
-                  ${BuildPhotoGallery(state)}
-                  ${addTabClickEvents(state)}
+                  ${BuildPhotoGallery(marsPhotos, currentRover)}
+
                 </div>
               </div>
             </div>
@@ -70,12 +74,13 @@ const Greeting = (name) => {
 }
 
 
-const BuildPhotoGallery = (state) => {
+const BuildPhotoGallery = (marsPhotos, currentRover) => {
   clearContent()
-  let { marsPhotos, currentRover } = state
   // use of ImmutableJS
   const photosMap = Map(marsPhotos)
+  console.log('BuildPhotoGallery: Imm photosMap', photosMap)
   let galleryContent = photosMap.get('photos')
+  console.log('BuildPhotoGallery: Imm from photos', galleryContent)
   if (galleryContent && galleryContent.photos && galleryContent.photos.length > 0) {
     let gallery = ''
     //higher order function
@@ -84,7 +89,8 @@ const BuildPhotoGallery = (state) => {
     })
     return gallery
   } else {
-    getRoverPhotos(state)
+    console.log('BuildPhotoGallery: getRoverPhotos i think some throttlings is happening', marsPhotos)
+    getRoverPhotos(marsPhotos, currentRover)
     return '<div>No Photos available</div>'
   }
 }
@@ -113,20 +119,8 @@ const initSlider = () => {
     rewind: true,
     autoplay: 0,
     animation: 500,
-    // responsive: {
-    //       "0": { count: 1.5, mode: "free", buttons: false },
-    //       "480": { count: 2.5, mode: "free", buttons: false },
-    //       "768": { count: 3, move: 3, touch: false, dots: false },
-    //       "1440": { count: 4, move: 2, touch: false, dots: false },
-    //   },
   };
   var carousel = new latte.Carousel(".roverSlider", options);
-}
-
-const noPhotos = () => {
-  return (`
-    <div>No phptos available</div>
-    `)
 }
 
 const getTabs = (currentRover, rovers) => {
@@ -138,17 +132,21 @@ const getTabs = (currentRover, rovers) => {
   return tabs
 }
 
-const getRoverPhotos = (state) => {
-    let { currentRover, marsPhotos } = state
-    fetch(`http://localhost:3000/marsphotos?rover=${currentRover.toLowerCase()}`)
+const getRoverPhotos = (marsPhotos, currentRover) => {
+    console.log('getRoverPhotos: do we already have photos?', marsPhotos)
+    console.log('getRoverPhotos: currentRover', currentRover)
+    if (Object.keys(marsPhotos).length === 0) {
+    fetch(`http://localhost:3000/marsphotos?rover=${currentRover}`)
         .then(res => res.json())
         .then((marsPhotos) => {
           if (Object.keys(marsPhotos.photos.photos).length > 0) {
+            console.log('getRoverPhotos: updateing store with marsPhotos', marsPhotos)
             //only update store if api returns photos
             updateStore(store, { marsPhotos })
           }
         })
-    return marsPhotos
+      }
+    //return marsPhotos
 }
 
 const hasClass = (elem, className) => {
@@ -162,16 +160,17 @@ const clearContent = () => {
   }
 }
 
-const addTabClickEvents = (state) => {
-  let { currentRover } = state
+const addTabClickEvents = (currentRover) => {
+  console.log('addTablcliickevents: curentrovr',currentRover)
   window.addEventListener('click', function (e) {
       if (hasClass(e.target, 'tab')) {
         dataRover = e.target.dataset.rover
         currentRover = dataRover.charAt(0).toUpperCase() + dataRover.slice(1)
+        console.log('addTablcliickevents: to lower curentrovr',currentRover)
         //clear marsphotos
         let marsPhotos = {}
+        console.log('addTabClickEvents: updting store', marsPhotos)
         updateStore(store, { currentRover, marsPhotos })
-        getRoverPhotos(state)
       }
   }, false);
 };
