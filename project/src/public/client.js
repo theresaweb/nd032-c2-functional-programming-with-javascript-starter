@@ -13,7 +13,6 @@ const root = document.getElementById('root')
 
 const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
-    console.log('updateStore: store',store)
     let photoState = store.marsPhotos.photos
     let apiError = photoState && photoState.error
     let photos = photoState && photoState.photos
@@ -25,7 +24,6 @@ const updateStore = (store, newState) => {
 }
 
 const render = async (root, state) => {
-    console.log('render: rendering root', state)
     root.innerHTML = App(state)
     setTimeout(addTabClickEvents(state.currentRover), 10000)
 }
@@ -33,7 +31,6 @@ const render = async (root, state) => {
 // create content
 const App = (state) => {
     let { currentRover, rovers, marsPhotos } = state
-    console.log('App: currentrover', currentRover)
     return `
         <header></header>
         <main>
@@ -56,6 +53,31 @@ const App = (state) => {
 
 // listening for load event because page should load before any JS is called
 window.addEventListener('load', () => {
+  // idea is to get all the data here for all roverSlider
+  // then create an immmutable map an use it for the user interaction
+  // need to use async otherwise map finishes before api calls returns
+  // https://flaviocopes.com/javascript-async-await-array-map/
+  const list = [1, 2, 3, 4, 5] //...an array filled with values
+
+  const functionWithPromise = item => { //a function that returns a promise
+    console.log('functionWithPromise')
+    return Promise.resolve(item)
+  }
+
+  const anAsyncFunction = async item => {
+    console.log('anAsyncFunction')
+    return functionWithPromise(item)
+  }
+
+  const getData = async () => {
+    console.log('getData')
+    return Promise.all(list.map(item => anAsyncFunction(item)))
+  }
+
+  getData().then(data => {
+    console.log('getData then')
+    console.log(data)
+  })
     render(root, store)
 })
 
@@ -78,9 +100,7 @@ const BuildPhotoGallery = (marsPhotos, currentRover) => {
   clearContent()
   // use of ImmutableJS
   const photosMap = Map(marsPhotos)
-  console.log('BuildPhotoGallery: Imm photosMap', photosMap)
   let galleryContent = photosMap.get('photos')
-  console.log('BuildPhotoGallery: Imm from photos', galleryContent)
   if (galleryContent && galleryContent.photos && galleryContent.photos.length > 0) {
     let gallery = ''
     //higher order function
@@ -89,7 +109,6 @@ const BuildPhotoGallery = (marsPhotos, currentRover) => {
     })
     return gallery
   } else {
-    console.log('BuildPhotoGallery: getRoverPhotos i think some throttlings is happening', marsPhotos)
     getRoverPhotos(marsPhotos, currentRover)
     return '<div>No Photos available</div>'
   }
@@ -133,14 +152,11 @@ const getTabs = (currentRover, rovers) => {
 }
 
 const getRoverPhotos = (marsPhotos, currentRover) => {
-    console.log('getRoverPhotos: do we already have photos?', marsPhotos)
-    console.log('getRoverPhotos: currentRover', currentRover)
     if (Object.keys(marsPhotos).length === 0) {
     fetch(`http://localhost:3000/marsphotos?rover=${currentRover}`)
         .then(res => res.json())
         .then((marsPhotos) => {
           if (Object.keys(marsPhotos.photos.photos).length > 0) {
-            console.log('getRoverPhotos: updateing store with marsPhotos', marsPhotos)
             //only update store if api returns photos
             updateStore(store, { marsPhotos })
           }
@@ -161,15 +177,12 @@ const clearContent = () => {
 }
 
 const addTabClickEvents = (currentRover) => {
-  console.log('addTablcliickevents: curentrovr',currentRover)
   window.addEventListener('click', function (e) {
       if (hasClass(e.target, 'tab')) {
         dataRover = e.target.dataset.rover
         currentRover = dataRover.charAt(0).toUpperCase() + dataRover.slice(1)
-        console.log('addTablcliickevents: to lower curentrovr',currentRover)
         //clear marsphotos
         let marsPhotos = {}
-        console.log('addTabClickEvents: updting store', marsPhotos)
         updateStore(store, { currentRover, marsPhotos })
       }
   }, false);
