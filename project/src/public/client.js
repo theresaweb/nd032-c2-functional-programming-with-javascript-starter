@@ -1,4 +1,4 @@
-const { Map } = require('immutable')
+const { fromJS, List } = require('immutable')
 
 
 let store = {
@@ -13,17 +13,20 @@ const root = document.getElementById('root')
 
 const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
-    let photoState = store.marsPhotos.photos
-    let apiError = photoState && photoState.error
-    let photos = photoState && photoState.photos
-    render(root, store)
-    let sliderHtml = document.querySelector('.roverSlider')
-    if (sliderHtml && !apiError && photos && Object.keys(photos).length > 0) {
-      initSlider()
+    console.log('store after updating', store)
+    if (!store.marsPhotos.getIn([0,'photos'])) {
+      //just check the first rover to see if api threw an error
+      return;
     }
+    render(root, store)
 }
 
 const render = async (root, state) => {
+    console.log('render store', state)
+    let sliderHtml = document.querySelector('.roverSlider')
+    if (sliderHtml) {
+      initSlider()
+    }
     root.innerHTML = App(state)
     setTimeout(addTabClickEvents(state.currentRover), 10000)
 }
@@ -41,7 +44,7 @@ const App = (state) => {
               </div>
               <div class="content">
                 <div class="roverSlider" id="carousel">
-                  ${BuildPhotoGallery(marsPhotos, currentRover)}
+                  ${BuildPhotoGallery(marsPhotos, currentRover, rovers)}
 
                 </div>
               </div>
@@ -54,31 +57,28 @@ const App = (state) => {
 // listening for load event because page should load before any JS is called
 window.addEventListener('load', () => {
   // idea is to get all the data here for all roverSlider
-  // then create an immmutable map an use it for the user interaction
+  // then create an immmutable map or list and use it for the user interaction
   // need to use async otherwise map finishes before api calls returns
   // https://flaviocopes.com/javascript-async-await-array-map/
-  const list = [1, 2, 3, 4, 5] //...an array filled with values
+  const rovers = store.rovers
 
-  const functionWithPromise = item => { //a function that returns a promise
-    console.log('functionWithPromise')
-    return Promise.resolve(item)
+  const getARover = item => {
+    return Promise.resolve(fetch(`http://localhost:3000/marsphotos?rover=${item}`)
+            .then(res => res.json())
+            .then((marsPhotos) => {
+                return marsPhotos.photos
+            }))
   }
-
-  const anAsyncFunction = async item => {
-    console.log('anAsyncFunction')
-    return functionWithPromise(item)
+  const makeAnApiCall = async item => {
+    return getARover(item)
   }
-
-  const getData = async () => {
-    console.log('getData')
-    return Promise.all(list.map(item => anAsyncFunction(item)))
+  const getTheData = async () => {
+    return Promise.all(rovers.map((item,index) => makeAnApiCall(item)))
   }
-
-  getData().then(data => {
-    console.log('getData then')
-    console.log(data)
+  getTheData().then(data => {
+    let marsPhotos = fromJS(data);
+    updateStore(store, { marsPhotos })
   })
-    render(root, store)
 })
 
 // ------------------------------------------------------  COMPONENTS
@@ -96,21 +96,23 @@ const Greeting = (name) => {
 }
 
 
-const BuildPhotoGallery = (marsPhotos, currentRover) => {
+const BuildPhotoGallery = (marsPhotos, currentRover, rovers) => {
   clearContent()
   // use of ImmutableJS
-  const photosMap = Map(marsPhotos)
-  let galleryContent = photosMap.get('photos')
-  if (galleryContent && galleryContent.photos && galleryContent.photos.length > 0) {
+  // get index of currentRover
+  let roverIndex = rovers.indexOf(currentRover);
+  let galleryContent = marsPhotos.getIn([roverIndex,'photos'])
+  console.log('gallerycontent',galleryContent)
+  if (galleryContent) {
     let gallery = ''
     //higher order function
-    gallery = galleryContent.photos.reduce((allSlides, content) => {
-      return allSlides + gallerySlide(content.img_src, content.camera, content.rover)
+    gallery = galleryContent.reduce((allSlides, content) => {
+      console.log('thisslide',gallerySlide(content.get('img_src'), content.get('camera'), content.get('rover')))
+      console.log('allslides so far',allSlides)
+      return allSlides + gallerySlide(content.get('img_src'), content.get('camera'), content.get('rover'))
     })
+    //console.log('gallery after reduce',gallery)
     return gallery
-  } else {
-    getRoverPhotos(marsPhotos, currentRover)
-    return '<div>No Photos available</div>'
   }
 }
 
@@ -118,10 +120,10 @@ const gallerySlide = (imgUrl, camera, rover) => {
   return (`
     <div class="latte-item">
       <div class="roverImg"><img src=${imgUrl} /></div>
-      <div class="roverCamera"><strong>Camera:</strong> ${camera.full_name} (${camera.name})</div>
-      <div class="roverName"><strong>Rover:</strong> ${rover.name}</div>
-      <div class="roverInfo"><strong>Launched:</strong> ${rover.launch_date}</div>
-      <div class="roverInfo"><strong>Landed:</strong> ${rover.landing_date}</div>
+      <div class="roverCamera"><strong>Camera:</strong> ${camera.get('full_name')} (${camera.get('name')})</div>
+      <div class="roverName"><strong>Rover:</strong> ${rover.get('name')}</div>
+      <div class="roverInfo"><strong>Launched:</strong> ${rover.get('launch_date')}</div>
+      <div class="roverInfo"><strong>Landed:</strong> ${rover.get('landing_date')}</div>
     </div>
     `)
 }
@@ -158,7 +160,7 @@ const getRoverPhotos = (marsPhotos, currentRover) => {
         .then((marsPhotos) => {
           if (Object.keys(marsPhotos.photos.photos).length > 0) {
             //only update store if api returns photos
-            updateStore(store, { marsPhotos })
+            //updateStore(store, { marsPhotos })
           }
         })
       }
@@ -183,7 +185,7 @@ const addTabClickEvents = (currentRover) => {
         currentRover = dataRover.charAt(0).toUpperCase() + dataRover.slice(1)
         //clear marsphotos
         let marsPhotos = {}
-        updateStore(store, { currentRover, marsPhotos })
+        //updateStore(store, { currentRover, marsPhotos })
       }
   }, false);
 };
